@@ -9,7 +9,7 @@
 static char   GetArrElem    (char* arr, size_t elemIndex);
 static char*  GetArrElemPtr (char* arr, size_t elemIndex);
 static size_t CalcFileLen   (const char* FileName);
-static void   SetLine       (char** split_buffer, size_t* word_i, char* setLine);
+static void   SetWord       (char** split_buffer, size_t* word_i, char* SetWord);
 static bool   IsPassSymbol  (char c);
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ char** ReadBufferFromFile(const char* file, size_t* bufSize)
 
     size_t word_i = 0;
 
-    SetLine(split_buffer, &word_i, GetArrElemPtr(buffer, 0));
+    SetWord(split_buffer, &word_i, GetArrElemPtr(buffer, 0));
 
     for (size_t buffer_i = 0; buffer_i <= bufferLen; buffer_i++)
     {
@@ -67,7 +67,7 @@ char** ReadBufferFromFile(const char* file, size_t* bufSize)
                 bufElem = GetArrElem(buffer, buffer_i);
             }
     
-            SetLine(split_buffer, &word_i, GetArrElemPtr(buffer, buffer_i));
+            SetWord(split_buffer, &word_i, GetArrElemPtr(buffer, buffer_i));
         }
     }
 
@@ -123,13 +123,13 @@ static char* GetArrElemPtr(char* arr, size_t elemIndex)
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
-static void SetLine(char** split_buffer, size_t* word_i, char* setLine)
+static void SetWord(char** split_buffer, size_t* word_i, char* SetWord)
 {
     assert(split_buffer);
-    assert(setLine);
+    assert(SetWord);
     assert(word_i);
 
-    split_buffer[*word_i] = setLine;
+    split_buffer[*word_i] = SetWord;
     (*word_i)++;
     return;
 }
