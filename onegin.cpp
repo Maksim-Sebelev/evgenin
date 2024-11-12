@@ -14,7 +14,7 @@ static bool   IsPassSymbol  (char c);
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
-int strtoint(char* str)
+int strtint(char* str)
 {
     long res = 0;
     char* strEnd = nullptr;
