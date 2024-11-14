@@ -6,11 +6,14 @@
 #include <stdlib.h>
 #include "onegin.h"
 
-static char   GetArrElem    (char* arr, size_t elemIndex);
-static char*  GetArrElemPtr (char* arr, size_t elemIndex);
-static size_t CalcFileLen   (const char* FileName);
-static void   SetWord       (char** split_buffer, size_t* word_i, char* SetWord);
-static bool   IsPassSymbol  (const char c);
+static char   GetArrElem       (char* arr, size_t elemIndex);
+static char*  GetArrElemPtr    (char* arr, size_t elemIndex);
+static size_t CalcFileLen      (const char* FileName);
+static void   SetWord          (char** split_buffer, size_t* word_i, char* SetWord);
+static bool   IsPassSymbol     (const char c);
+static void   FindFirstNotPass (char* buffer, size_t* buffer_i);
+static void   ReadBufRealloc   (char*** split_buffer, size_t splitBufSize);
+
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -34,47 +37,47 @@ char** ReadBufferFromFile(const char* file, size_t* bufSize)
 
     size_t bufferLen = CalcFileLen(file);
 
-    char*  buffer       = (char*)  calloc(bufferLen + 1, sizeof(char));
-    char** split_buffer = (char**) calloc(bufferLen + 1, sizeof(char*));
+    char*  buffer       = (char*)  calloc(bufferLen + 2, sizeof(char));
+    char** split_buffer = (char**) calloc(bufferLen + 2, sizeof(char*));
 
-    fread(buffer, sizeof(char), bufferLen + 1, filePtr);
+    fread(buffer, sizeof(char), bufferLen, filePtr);
     fclose(filePtr);
 
-    buffer[bufferLen] = '\0';
-
-    char bufElem = GetArrElem(buffer, 0);
-
-    assert(bufElem != ' ');
-    assert(bufElem != '\n');
-
-    bufElem = GetArrElem(buffer, bufferLen - 1);
-
-    assert(bufElem == '\n');
+    buffer[bufferLen ]    = ' ';
+    buffer[bufferLen + 1] = '\0';
 
     size_t word_i = 0;
     SetWord(split_buffer, &word_i, GetArrElemPtr(buffer, 0));
+    split_buffer++;
 
-    for (size_t buffer_i = 0; buffer_i <= bufferLen; buffer_i++)
+    size_t buffer_i = 0;
+    FindFirstNotPass(buffer, &buffer_i);
+
+    word_i = 0;
+    SetWord(split_buffer, &word_i, GetArrElemPtr(buffer, buffer_i));
+
+    for (; buffer_i <= bufferLen + 1; buffer_i++)
     {
-        bufElem = GetArrElem(buffer, buffer_i);
+        char bufElem = GetArrElem(buffer, buffer_i);
         if (IsPassSymbol(bufElem))
         {
-            while (IsPassSymbol(bufElem) && buffer_i <= bufferLen)
+            do
             {
                 buffer[buffer_i] = '\0';
                 buffer_i++;
                 bufElem = GetArrElem(buffer, buffer_i);
             }
+            while (IsPassSymbol(bufElem) && buffer_i <= bufferLen);
+
             SetWord(split_buffer, &word_i, GetArrElemPtr(buffer, buffer_i));
         }
     }
 
     *bufSize = word_i - 1;
 
-    split_buffer = (char**) realloc(split_buffer, (*bufSize) * sizeof(char*));
+    ReadBufRealloc(&split_buffer, *bufSize);
 
     assert(split_buffer);
-    assert(*split_buffer);
 
     return split_buffer;
 }
@@ -84,12 +87,31 @@ char** ReadBufferFromFile(const char* file, size_t* bufSize)
 void BufferDtor(char** buffer)
 {
     assert(buffer);
+    buffer--;
+    assert(buffer);
 
     FREE(*buffer)
     FREE(buffer);
 
-    assert(!buffer);
+    buffer  = nullptr;
 
+    return;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+
+static void ReadBufRealloc(char*** split_buffer, size_t splitBufSize)
+{
+    (*split_buffer)--;
+    assert(split_buffer);
+
+    *split_buffer = (char**) realloc(*split_buffer, (splitBufSize + 1) * sizeof(char*));
+
+    assert(split_buffer);
+    (*split_buffer)++;
+
+    assert(split_buffer);
+    assert(*split_buffer);
     return;
 }
 
@@ -136,6 +158,19 @@ static void SetWord(char** split_buffer, size_t* word_i, char* SetWord)
 static bool IsPassSymbol(const char c)
 {
     return (c == ' ') || (c == '\n');
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+
+static void FindFirstNotPass(char* buffer, size_t* buffer_i)
+{
+    while(IsPassSymbol(GetArrElem(buffer, *buffer_i)))
+    {
+        buffer[*buffer_i] = '\0';
+        (*buffer_i)++;
+    }
+
+    return;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------

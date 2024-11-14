@@ -11,6 +11,7 @@ int main()
     {
         printf("buf1[%2lu]: '%s'\n", i, buffer1[i]);
     }
+
     BufferDtor(buffer1);
 
 
