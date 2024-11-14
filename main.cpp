@@ -26,8 +26,9 @@ int main()
 
     for (size_t i = 0; i < buf2Size; i++)
     {
-        printf("buf2[%2lu]: '%d'\n", i, strtint(buffer2[i]));
+        printf("buf2[%2lu]: '%d'\n", i, strtoi(buffer2[i]));
     }
+
     BufferDtor(buffer2);
 
     return 0;

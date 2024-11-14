@@ -10,11 +10,11 @@ static char   GetArrElem    (char* arr, size_t elemIndex);
 static char*  GetArrElemPtr (char* arr, size_t elemIndex);
 static size_t CalcFileLen   (const char* FileName);
 static void   SetWord       (char** split_buffer, size_t* word_i, char* SetWord);
-static bool   IsPassSymbol  (char c);
+static bool   IsPassSymbol  (const char c);
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
-int strtint(char* str)
+int strtoi(const char* str)
 {
     long res = 0;
     char* strEnd = nullptr;
@@ -25,7 +25,7 @@ int strtint(char* str)
     return (int) res;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//============================ Read File ==============================================================================================================
 
 char** ReadBufferFromFile(const char* file, size_t* bufSize)
 {
@@ -34,8 +34,8 @@ char** ReadBufferFromFile(const char* file, size_t* bufSize)
 
     size_t bufferLen = CalcFileLen(file);
 
-    char*  buffer       = (char*)   calloc(bufferLen + 1, sizeof(char));
-    char** split_buffer = (char**)  calloc(bufferLen + 1, sizeof(char*));
+    char*  buffer       = (char*)  calloc(bufferLen + 1, sizeof(char));
+    char** split_buffer = (char**) calloc(bufferLen + 1, sizeof(char*));
 
     fread(buffer, sizeof(char), bufferLen + 1, filePtr);
     buffer[bufferLen] = '\0';
@@ -52,7 +52,6 @@ char** ReadBufferFromFile(const char* file, size_t* bufSize)
     assert(bufElem == '\n');
 
     size_t word_i = 0;
-
     SetWord(split_buffer, &word_i, GetArrElemPtr(buffer, 0));
 
     for (size_t buffer_i = 0; buffer_i <= bufferLen; buffer_i++)
@@ -66,7 +65,6 @@ char** ReadBufferFromFile(const char* file, size_t* bufSize)
                 buffer_i++;
                 bufElem = GetArrElem(buffer, buffer_i);
             }
-    
             SetWord(split_buffer, &word_i, GetArrElemPtr(buffer, buffer_i));
         }
     }
@@ -136,7 +134,7 @@ static void SetWord(char** split_buffer, size_t* word_i, char* SetWord)
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
-static bool IsPassSymbol(char c)
+static bool IsPassSymbol(const char c)
 {
     return (c == ' ') || (c == '\n');
 }

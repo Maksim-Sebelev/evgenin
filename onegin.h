@@ -14,7 +14,7 @@
 // функции ReadBufferFromFile будет равным количеству строк в массиве,
 // на который она возвращает указатель.
 
-// strtint преобразовывает строку в число,
+// strtoi преобразовывает строку в число,
 // в случае если не вся строка является числом, программа будет завершена аварийно.
 
 // если флаги компиляции позволяют не освобождать память 
@@ -22,9 +22,8 @@
 // в протвном случае - BufferDtor должна быть использована.
 
 char** ReadBufferFromFile (const char* file, size_t* bufSize);
-int    strtint           (char* str);
+int    strtoi             (const char* str);
 void   BufferDtor         (char** buffer);
-
 
 #define FREE(ptr) free(ptr); ptr = NULL;
 
