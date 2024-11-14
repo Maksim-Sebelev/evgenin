@@ -38,9 +38,9 @@ char** ReadBufferFromFile(const char* file, size_t* bufSize)
     char** split_buffer = (char**) calloc(bufferLen + 1, sizeof(char*));
 
     fread(buffer, sizeof(char), bufferLen + 1, filePtr);
-    buffer[bufferLen] = '\0';
-
     fclose(filePtr);
+
+    buffer[bufferLen] = '\0';
 
     char bufElem = GetArrElem(buffer, 0);
 
@@ -76,7 +76,6 @@ char** ReadBufferFromFile(const char* file, size_t* bufSize)
     assert(split_buffer);
     assert(*split_buffer);
 
-    assert(split_buffer);
     return split_buffer;
 }
 
