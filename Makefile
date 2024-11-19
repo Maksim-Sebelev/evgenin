@@ -5,7 +5,9 @@ SOURCES = main.cpp onegin.cpp
 OBJECTS = $(SOURCES:.c=.o)
 HEADERS = $(SOURCES:.c=.h)
 
-all: $(SOURCES) main.exe
+EXE = main.exe
+
+all: $(SOURCES) $(EXE)
 
 
 main.exe: $(OBJECTS) 
@@ -15,5 +17,8 @@ main.exe: $(OBJECTS)
 	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o hello
-	rm -rf *.exe hello
+	rm -rf *.o
+	rm -rf *.exe
+
+run:
+	./$(EXE)

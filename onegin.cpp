@@ -12,8 +12,8 @@ static size_t CalcFileLen      (const char* FileName);
 static void   SetWord          (char** split_buffer, size_t* word_i, char* SetWord);
 static bool   IsPassSymbol     (const char c);
 static void   FindFirstNotPass (char* buffer, size_t* buffer_i);
+static void   Fread            (char* buffer, size_t bufferLen, FILE* filePtr);
 static void   ReadBufRealloc   (char*** split_buffer, size_t splitBufSize);
-
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -40,10 +40,14 @@ char** ReadBufferFromFile(const char* file, size_t* bufSize)
     char*  buffer       = (char*)  calloc(bufferLen + 2, sizeof(char));
     char** split_buffer = (char**) calloc(bufferLen + 2, sizeof(char*));
 
-    fread(buffer, sizeof(char), bufferLen, filePtr);
+    assert(buffer);
+    assert(split_buffer);
+
+    
+    Fread(buffer, bufferLen, filePtr);
     fclose(filePtr);
 
-    buffer[bufferLen ]    = ' ';
+    buffer[bufferLen]     = ' ';
     buffer[bufferLen + 1] = '\0';
 
     size_t word_i = 0;
@@ -95,6 +99,15 @@ void BufferDtor(char** buffer)
 
     buffer  = nullptr;
 
+    return;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+
+static void Fread(char* buffer, size_t bufferLen, FILE* filePtr)
+{
+    size_t freadReturn = fread(buffer, sizeof(char), bufferLen, filePtr);
+    assert(freadReturn == bufferLen);
     return;
 }
 
