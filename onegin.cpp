@@ -37,13 +37,12 @@ char** ReadBufferFromFile(const char* file, size_t* bufSize)
 
     size_t bufferLen = CalcFileLen(file);
 
-    char*  buffer       = (char*)  calloc(bufferLen + 2, sizeof(char));
-    char** split_buffer = (char**) calloc(bufferLen + 2, sizeof(char*));
+    char*  buffer       = (char*)  calloc(bufferLen + 2, sizeof(*buffer));
+    char** split_buffer = (char**) calloc(bufferLen + 2, sizeof(*split_buffer));
 
     assert(buffer);
     assert(split_buffer);
 
-    
     Fread(buffer, bufferLen, filePtr);
     fclose(filePtr);
 
@@ -170,7 +169,7 @@ static void SetWord(char** split_buffer, size_t* word_i, char* SetWord)
 
 static bool IsPassSymbol(const char c)
 {
-    return (c == ' ') || (c == '\n');
+    return (c == ' ') || (c == '\n') || (c == '\r');
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
