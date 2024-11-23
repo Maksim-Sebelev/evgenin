@@ -24,7 +24,7 @@ int strtoi(const char* const str)
     char* strEnd = nullptr;
     res = strtol(str, &strEnd, 10);
 
-    if (((int) strlen(str) != (strEnd - str)))
+    if (!IsInt(str, strEnd))
     {
         printf("\n\n'%s' - IS NOT A NUMBER.\n\n", str);
         assert(0 && "try to convert not int str to int.");
