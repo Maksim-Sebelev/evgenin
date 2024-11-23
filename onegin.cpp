@@ -17,20 +17,24 @@ static void   ReadBufRealloc   (char*** split_buffer, size_t splitBufSize);
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
-int strtoi(const char* str)
+int strtoi(const char* const str)
 {
     long res = 0;
     char* strEnd = nullptr;
     res = strtol(str, &strEnd, 10);
 
-    assert(strlen(str) == (size_t) (strEnd - str)); // проверка на то, вся ли строка является числом
+    if (((int) strlen(str) != (strEnd - str)))
+    {
+        printf("\n\n'%s' - IS NOT A NUMBER.\n\n", str);
+        assert(0 && "try to convert not int str to int.");
+    }
 
     return (int) res;
 }
 
 //============================ Read File ==============================================================================================================
 
-char** ReadBufferFromFile(const char* file, size_t* bufSize)
+char** ReadBufferFromFile(const char* const file, size_t* bufSize)
 {
     FILE* filePtr = fopen(file, "rb");
     assert(filePtr);
