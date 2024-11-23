@@ -14,6 +14,7 @@ static bool   IsPassSymbol     (const char c);
 static void   FindFirstNotPass (char* buffer, size_t* buffer_i);
 static void   Fread            (char* buffer, size_t bufferLen, FILE* filePtr);
 static void   ReadBufRealloc   (char*** split_buffer, size_t splitBufSize);
+static bool   IsInt            (const char* const str, const char* const strEnd);
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -30,6 +31,13 @@ int strtoi(const char* const str)
     }
 
     return (int) res;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+
+static bool IsInt(const char* const str, const char* const strEnd)
+{
+    return (int) strlen(str) == (strEnd - str);
 }
 
 //============================ Read File ==============================================================================================================
