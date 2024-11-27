@@ -16,9 +16,9 @@
 // перед завершением программы, функция BufferDtor может не использоваться
 // в протвном случае - BufferDtor должна быть использована.
 
-char** ReadBufferFromFile (const char* const file, size_t* bufSize);
+const char** ReadBufferFromFile (const char* const file, size_t* bufSize);
 int    strtoi             (const char* const str);
-void   BufferDtor         (char** buffer);
+void   BufferDtor         (const char** buffer);
 
 #define FREE(ptr) free(ptr); ptr = NULL;
 

@@ -5,7 +5,7 @@ int main()
     const char* file1 = "test1.txt";
     
     size_t buf1Size = 0;
-    char** buffer1 = ReadBufferFromFile(file1, &buf1Size);
+    const char** buffer1 = ReadBufferFromFile(file1, &buf1Size);
 
     for (size_t i = 0; i < buf1Size; i++)
     {
@@ -21,7 +21,7 @@ int main()
     const char* file2 = "test2.txt";
 
     size_t buf2Size = 0;
-    char** buffer2 = ReadBufferFromFile(file2, &buf2Size);
+    const char** buffer2 = ReadBufferFromFile(file2, &buf2Size);
 
     for (size_t i = 0; i < buf2Size; i++)
     {
