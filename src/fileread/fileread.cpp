@@ -1,11 +1,10 @@
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <assert.h>
 #include <string.h>
-#include <stdlib.h>
 #include "fileread/fileread.hpp"
-#include "log/log.hpp"
+#include "lib/colorPrint.hpp"
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -20,35 +19,48 @@ struct Pointer
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-static size_t CalcFileLen      (const char* const fileName);
-static void SetNullWord(Word** split_buffer, const char* buffer);
-static void SetPreviousWordLen(Word* split_buffer, const Pointer* pointer, size_t wordLen);
-static void SetWordAndFilePosition(Word* split_buffer, const char* word, Pointer* pointer);
+static size_t CalcFileLen            (const char* const fileName);
+static size_t GetPreviousWordLen     (const Pointer* pointer);
 
-static size_t GetPreviousWordLen(const Pointer* pointer);
-static bool   IsPassSymbol     (const char c, Pointer* pointer);
-static void   Fread            (char* buffer, size_t bufferLen, FILE* filePtr);
-static void   ReadBufRealloc   (WordArray* wordArray);
-static bool   IsInt            (const char* const str, const char* const strEnd);
-static bool   IsSpace          (const char c);
-static bool   IsSlashN         (const char c);
-static bool   IsSlashR         (const char c);
-static bool   IsSlashT(const char c);
+static void   Fread                  (char* buffer, size_t bufferLen, FILE* filePtr);
+static void   ReadBufRealloc         (WordArray* wordArray);
+
+static void   SetNullWord            (Word** split_buffer, const char* buffer);
+static void   SetPreviousWordLen     (Word* split_buffer, const Pointer* pointer, size_t wordLen);
+static void   SetWordAndFilePosition (Word* split_buffer, const char* word, Pointer* pointer);
+
+
+static bool   IsPassSymbolAndChangePointer           (const char c, Pointer* pointer);
+static bool   IsPassSymbol           (const char c);
+static bool   IsSpace                (const char c);
+static bool   IsSlashN               (const char c);
+static bool   IsSlashR               (const char c);
+static bool   IsSlashT               (const char c);
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-int strtoi(const char* const str)
+int WordToInt(const Word* word)
 {
-    assert(str);
+    assert(word);
 
     long res = 0;
-    char* strEnd = NULL;
+
+
+    const char* str    = word->word;
+    char*       strEnd = nullptr;
+    size_t      len    = word->len;
+
     res = strtol(str, &strEnd, 10);
 
-    if (!IsInt(str, strEnd))
+    if (size_t (strEnd - str) != len)
     {
-        printf("\n\n'%s' - IS NOT A NUMBER.\n\n", str);
-        assert(0 && "try to convert not int str to int.");
+        COLOR_PRINT(RED, 
+            "Trying to convert not 'int' str to 'int'\n"
+            "str (word) = '%s'\n"
+            "file: %lu:%lu\n",
+            str, word->line, word->inLine
+        );
+        exit(1);
     }
 
     return (int) res;
@@ -56,12 +68,30 @@ int strtoi(const char* const str)
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-static bool IsInt(const char* const str, const char* const strEnd)
+double WordToDouble(const Word* word)
 {
-    assert(str);
-    assert(strEnd);
+    assert(word);
 
-    return (int) strlen(str) == (strEnd - str);
+    double res = 0;
+
+    const char* str    = word->word;
+    char*       strEnd = nullptr;
+    size_t      len    = word->len;
+
+    res = strtod(str, &strEnd);
+
+    if (size_t (strEnd - str) != len)
+    {
+        COLOR_PRINT(RED, 
+            "Trying to convert not 'double` str to 'double'\n"
+            "str (word) = '%s'\n"
+            "file: %lu:%lu\n",
+            str, word->line, word->inLine
+        );
+        exit(1);
+    }
+
+    return res;
 }
 
 //============================ Read File ==============================================================================================================
@@ -105,11 +135,13 @@ WordArray ReadBufferFromFile(const char* file)
         .wbp = 0,
     };
 
-    SetWordAndFilePosition(words, &buffer[pointer.bp], &pointer);
+
+    if (!IsPassSymbol(buffer[0]))
+        SetWordAndFilePosition(words, &buffer[0], &pointer);
 
     for (; pointer.bp < realBufferLen; pointer.bp++)
     {
-        if (!IsPassSymbol(buffer[pointer.bp], &pointer))
+        if (!IsPassSymbolAndChangePointer(buffer[pointer.bp], &pointer))
         {
             pointer.sp++;
             continue;
@@ -121,7 +153,7 @@ WordArray ReadBufferFromFile(const char* file)
         {
             buffer[pointer.bp] = '\0';  
             pointer.bp++;
-        } while (IsPassSymbol(buffer[pointer.bp], &pointer));
+        } while (IsPassSymbolAndChangePointer(buffer[pointer.bp], &pointer));
         
         SetPreviousWordLen(words, &pointer, previousWordLen);
         SetWordAndFilePosition(words, &buffer[pointer.bp], &pointer);
@@ -234,9 +266,10 @@ static void SetPreviousWordLen(Word* split_buffer, const Pointer* pointer, size_
 {
     assert(split_buffer);
     assert(pointer);
-    assert(pointer->wp >= 1);
 
-    size_t wordPointer = pointer->wp - 1;
+    size_t wordPointer = pointer->wp;
+
+    wordPointer = (wordPointer == 0) ? 0 : wordPointer - 1;
 
     split_buffer[wordPointer].len = wordLen;
 
@@ -257,7 +290,18 @@ static void SetNullWord(Word** split_buffer, const char* buffer)
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-static bool IsPassSymbol(const char c, Pointer* pointer)
+static bool IsPassSymbol(const char c)
+{
+    return (IsSpace (c) ||
+            IsSlashN(c) ||
+            IsSlashR(c) ||
+            IsSlashT(c)
+           );
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+static bool IsPassSymbolAndChangePointer(const char c, Pointer* pointer)
 {
     assert(pointer);
 
