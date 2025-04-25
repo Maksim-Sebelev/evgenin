@@ -1,8 +1,12 @@
-#ifndef ONEGIN_H
-#define ONEGIN_H
+#ifndef ONEGIN_HPP
+#define ONEGIN_HPP
 
 #include <stdio.h>
 #include <malloc.h>
+
+
+#define FREE(ptr) free((char*)ptr); ptr = nullptr
+
 
 // функция ReadBufferFromFile возвращает указатель на массив строк,
 // который строится внутри нее. Значение агрумента bufSize после исполнения
@@ -16,10 +20,27 @@
 // перед завершением программы, функция BufferDtor может не использоваться
 // в протвном случае - BufferDtor должна быть использована.
 
-const char** ReadBufferFromFile (const char* const file, size_t* bufSize);
-int    strtoi             (const char* const str);
-void   BufferDtor         (const char** buffer);
+struct Word
+{
+    const char* word;
+    size_t      len;
+    size_t      line;
+    size_t      inLine;
+};
 
-#define FREE(ptr) free(ptr); ptr = NULL;
+struct WordArray
+{
+    Word*  words;
+    size_t size;
+};
 
-#endif
+WordArray ReadBufferFromFile(const char* file);
+
+int          strtoi             (const char* const str   );
+void         BufferDtor         (WordArray* wordArray);
+
+
+
+
+
+#endif //ONEGIN_HPP

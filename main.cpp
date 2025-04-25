@@ -1,34 +1,36 @@
-#include "onegin.h"
+#include "fileread/fileread.hpp"
+#include "log/log.hpp"
 
 int main()
 {
-    const char* file1 = "test1.txt";
+
+    printf("Start\n");
+    OPEN_LOG();
+    const char* file1 = "test2.txt";
+
     
-    size_t buf1Size = 0;
-    const char** buffer1 = ReadBufferFromFile(file1, &buf1Size);
-
-    for (size_t i = 0; i < buf1Size; i++)
+    WordArray words = ReadBufferFromFile(file1);
+    
+    // LOG_PRINT(Red, "size = '%lu'\n", words.size);
+    
+    for (size_t i = 0; i < words.size; i++)
     {
-        printf("buf1[%2lu]: '%s'\n", i, buffer1[i]);
+        Word word = words.words[i];
+        LOG_PRINT(Yellow, "word[%1lu] = \n{", i);
+        LOG_PRINT(Green, "\tword = '%s'\n\tlen = %lu\n\t%s:%lu:%lu\n", word.word, word.len, file1, word.line, word.inLine);
+        LOG_PRINT(Yellow, "}\n\n");
+    
     }
-
-    BufferDtor(buffer1);
+        
+        
+    BufferDtor(&words);
+        
     //-----------------------------------------------------
-    printf("\n\n");
+    LOG_NS(); LOG_NS(); LOG_NS();
     //-----------------------------------------------------
 
+    CLOSE_LOG();
 
-    const char* file2 = "test2.txt";
-
-    size_t buf2Size = 0;
-    const char** buffer2 = ReadBufferFromFile(file2, &buf2Size);
-
-    for (size_t i = 0; i < buf2Size; i++)
-    {
-        printf("buf2[%2lu]: '%d'\n", i, strtoi(buffer2[i]));
-    }
-
-    BufferDtor(buffer2);
-
+    printf("\nEnd\n");
     return 0;
 }

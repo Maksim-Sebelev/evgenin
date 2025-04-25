@@ -1,23 +1,15 @@
-
- 
-  
-   
-    
-     
-     
-         aaaaa
+A  : P -> Q
 
 
-bbb cccc               \'r'    2212
-ddd2
+{pi} - basis в P
+{qi} - basis в Q
 
-I wont to kill everyone on this planet
 
-eeee fff ggg hhhh jjj kk ll
+S: pi -> p`i
+T: qi -> q`i
 
-if you read this, you must know: you will die soon!
+A` = T^-1 * A * S
 
-hahaha
-is just a prank bro
-
-because you will die now
+q = Ap
+Tq` = A*Sp`
+q` = (((T^-1 * A * S))) * p`
